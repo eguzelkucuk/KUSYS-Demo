@@ -1,0 +1,67 @@
+﻿@model KUSYS_Demo.Models.EnrollmentViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>Enrollment</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <select id="StudentSelection" class="form-select" asp-items="Model.StudentList">
+                <option value="default">Select A Student</option>
+            </select>
+            <select id="CourseList" class="form-select">
+                <option value="default">Select A Course</option>
+            </select>
+
+            @section Scripts2{
+                <script>
+                    $(function () {
+                        $('#StudentSelection').change(function () {
+                            $('#CourseList').empty();
+                            $.ajax({
+                                url: '/Enrollments/CourseList',
+                                dataType: 'json',
+                                data: { id: $("#StudentSelection").val() },
+                                success: function (data) {
+
+                                    $('#CourseList').append('<option value="'-1'">'Select a Course '</option>');
+
+                                    $.each(data, (index, value) => {
+                                        $('#CourseList').append('<option value="'${value.value}'"> '${value.text}'</option>');
+
+                                    });
+
+                                }
+                            })
+
+                        });
+                    })
+
+                </script>
+            }
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
+
