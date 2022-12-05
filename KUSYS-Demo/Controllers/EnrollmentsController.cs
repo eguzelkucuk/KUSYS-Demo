@@ -28,10 +28,8 @@ namespace KUSYS_Demo.Controllers
         }
 
         //GET: Enrollments/Create
-        public IActionResult Create()
+        public IActionResult Create(EnrollmentViewModel enrollmentModel)
         {
-
-            EnrollmentViewModel enrollmentModel = new EnrollmentViewModel();
 
             enrollmentModel.StudentList = new List<SelectListItem>();
             var students = _context.Student.ToList();
@@ -72,7 +70,7 @@ namespace KUSYS_Demo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,StudentId,CourseId")] EnrollmentViewModel enrollmentModel)
+        public async Task<IActionResult> Create([Bind("Id,StudentId,CourseId")] EnrollmentViewModel enrollmentModel,string value)
         {
 
             var enrollment = new Enrollment();
