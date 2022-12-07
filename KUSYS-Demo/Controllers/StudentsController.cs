@@ -16,7 +16,6 @@ namespace KUSYS_Demo.Controllers
     public class StudentsController : Controller
     {
         private readonly DatabaseContext _context;
-        //private readonly staticDatas staticDatas;
         public string userMailAddress;
         public string userRole;
 
@@ -25,8 +24,8 @@ namespace KUSYS_Demo.Controllers
         public StudentsController(DatabaseContext context)
         {
             _context = context;
-            userMailAddress= staticDatas.getUserMail();
-            userRole=staticDatas.getUserRole();
+            userMailAddress= StaticDatas.getUserMail();
+            userRole= StaticDatas.getUserRole();
         }
 
         // GET: Students
@@ -37,13 +36,15 @@ namespace KUSYS_Demo.Controllers
                 return View(await _context.Student.ToListAsync());
 
             }
-            if (userRole == "admin")
+            if (userRole == "user")
             {
                 var student = _context.Student.Where(x => x.Email == userMailAddress);
                 if (student == null)
                 {
                     return NotFound();
                 }
+                return View(await student.ToListAsync());
+
 
             }
 

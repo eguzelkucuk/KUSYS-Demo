@@ -47,7 +47,7 @@ namespace KUSYS_Demo.Repositories.Implementation
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                     role=userRole;   
                 }
-                staticDatas _stt = new staticDatas(user.Email,role);
+                StaticDatas _stt = new StaticDatas(user.Email,role);
                 status.StatusCode = 1;
                 status.Message = "Logged in successfully.";
               

@@ -40,10 +40,11 @@
             <td>
                 @if (User.IsInRole("admin"))
                 {
-                <a asp-action="Edit" class="p-3 mb-2 bg-warning text-white" asp-route-id="@item.Id">Edit</a> 
-                <a asp-action="Delete" class="p-3 mb-2 bg-warning text-white" asp-route-id="@item.Id">Delete</a>
+                <button type="button" class="p-3 mb-2 bg-primary text-white"><a asp-action="Edit" class="p-3 mb-2 bg-primary text-white" asp-route-id="@item.Id">Edit</a></button> 
+                <button type="button" class="p-3 mb-2 bg-danger text-white"> <a asp-action="Delete" class="p-3 mb-2 bg-danger text-white" asp-route-id="@item.Id">Delete</a></button>
+
                 }
-                <a><button type="button" class="p-3 mb-2 bg-warning text-white" data-toggle="ajax-modal" data-target="#myModal" data-url="@Url.Action($"Details/{item.Id}")">Details</button></a> 
+                <button type="button" class="p-3 mb-2 bg-warning text-white" data-toggle="ajax-modal" data-target="#myModal" data-url="@Url.Action($"Details/{item.Id}")"> <a class="p-3 mb-2 bg-warning text-white">Details</a></button> 
 
             </td>    
   

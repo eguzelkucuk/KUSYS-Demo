@@ -1,15 +1,15 @@
 ﻿namespace KUSYS_Demo.Repositories.Implementation
 {
-    public class staticDatas
+    public class StaticDatas
     {
         private static string _email = null;
         private static string _role = null;
 
-        private staticDatas()
+        private StaticDatas()
         {
 
         }
-        public staticDatas(string email,string role)
+        public StaticDatas(string email,string role)
         {
             _email = email; 
             _role = role;   

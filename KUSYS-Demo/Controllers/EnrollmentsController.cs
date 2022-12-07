@@ -9,40 +9,87 @@ using Microsoft.EntityFrameworkCore;
 using KUSYS_Demo.Models;
 using KUSYS_Demo.Models.Domain;
 using Microsoft.IdentityModel.Tokens;
+using KUSYS_Demo.Repositories.Implementation;
 
 namespace KUSYS_Demo.Controllers
 {
     public class EnrollmentsController : Controller
     {
         private readonly DatabaseContext _context;
+        public string userMailAddress;
+        public string userRole;
 
         public EnrollmentsController(DatabaseContext context)
         {
             _context = context;
+            userMailAddress = StaticDatas.getUserMail();
+            userRole = StaticDatas.getUserRole();
         }
 
         // GET: Enrollments
         public async Task<IActionResult> Index()
         {
             var enrollment = _context.Enrollment.Include(t => t.Course).Include(t => t.Student);
-            return View(enrollment.ToList());
+
+            if (userRole == "admin")
+            {
+                return View(enrollment.ToList());
+            }
+            if (userRole == "user")
+            {
+                enrollment = _context.Enrollment.Where(x => x.Student.Email == userMailAddress).Include(t => t.Course).Include(t => t.Student);
+                if (enrollment == null)
+                {
+                    return NotFound();
+                }
+                return View(await enrollment.ToListAsync());
+            }
+            return View(await enrollment.ToListAsync());
+
         }
 
         //GET: Enrollments/Create
         public IActionResult Create(EnrollmentViewModel enrollmentModel)
         {
-
-            enrollmentModel.StudentList = new List<SelectListItem>();
-            var students = _context.Student.ToList();
-            foreach (var item in students)
+            if (userRole == "admin")
             {
-                enrollmentModel.StudentList.Add(new SelectListItem
+                enrollmentModel.StudentList = new List<SelectListItem>();
+                var students = _context.Student.ToList();
+                foreach (var item in students)
                 {
-                    Text = item.FirstName + " " + item.LastName,
-                    Value = Convert.ToString(item.Id)
-                });
+                    enrollmentModel.StudentList.Add(new SelectListItem
+                    {
+                        Text = item.FirstName + " " + item.LastName,
+                        Value = Convert.ToString(item.Id)
+                    });
+                }
             }
+            else if (userRole == "user")
+            {
+                var students = _context.Student.Where(x => x.Email == userMailAddress).ToList();
+                if (students == null)
+                {
+                    return RedirectToAction(nameof(Index));
 
+                }
+                enrollmentModel.StudentList = new List<SelectListItem>();
+                foreach (var item in students)
+                {
+                    enrollmentModel.StudentList.Add(new SelectListItem
+                    {
+                        Text = item.FirstName + " " + item.LastName,
+                        Value = Convert.ToString(item.Id)
+                    });
+                }
+
+
+
+            }
+            else
+            {
+                return RedirectToAction(nameof(Index));
+
+            }
             enrollmentModel.CourseList = new List<SelectListItem>();
             var courses = _context.Course.ToList();
             foreach (var item in courses)
@@ -73,7 +120,7 @@ namespace KUSYS_Demo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,StudentId,CourseId")] EnrollmentViewModel enrollmentModel,string value)
+        public async Task<IActionResult> Create([Bind("Id,StudentId,CourseId")] EnrollmentViewModel enrollmentModel, string value)
         {
 
             var enrollment = new Enrollment();
@@ -92,43 +139,6 @@ namespace KUSYS_Demo.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-
-
-        // POST: Enrollments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id")] Enrollment enrollment)
-        {
-            if (id != enrollment.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(enrollment);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EnrollmentExists(enrollment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(enrollment);
         }
 
         // GET: Enrollments/Delete/5
@@ -163,14 +173,14 @@ namespace KUSYS_Demo.Controllers
             {
                 _context.Enrollment.Remove(enrollment);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool EnrollmentExists(int id)
         {
-          return _context.Enrollment.Any(e => e.Id == id);
+            return _context.Enrollment.Any(e => e.Id == id);
         }
     }
 }

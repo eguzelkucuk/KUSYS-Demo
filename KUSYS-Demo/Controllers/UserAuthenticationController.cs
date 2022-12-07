@@ -10,7 +10,6 @@ namespace KUSYS_Demo.Controllers
     public class UserAuthenticationController : Controller
     {
         private readonly IUserAuthenticationService _service;
-        private readonly staticDatas _staticDatas;
         public string userRole;
 
 
@@ -18,7 +17,7 @@ namespace KUSYS_Demo.Controllers
         public UserAuthenticationController(IUserAuthenticationService service)
         {
             this._service = service;
-            userRole = staticDatas.getUserRole();
+            userRole = StaticDatas.getUserRole();
 
 
         }
