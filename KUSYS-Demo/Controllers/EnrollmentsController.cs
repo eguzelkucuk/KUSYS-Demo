@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KUSYS_Demo.Models;
 using KUSYS_Demo.Models.Domain;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KUSYS_Demo.Controllers
 {
@@ -42,16 +43,18 @@ namespace KUSYS_Demo.Controllers
                 });
             }
 
-            //enrollmentModel.CourseList = new List<SelectListItem>();
-            //var courses = _context.Course.ToList();
-            //foreach (var item in courses)
-            //{
-            //    enrollmentModel.CourseList.Add(new SelectListItem
-            //    {
-            //        Text = item.Code + " " + item.Title,
-            //        Value = Convert.ToString(item.Id)
-            //    });
-            //}
+            enrollmentModel.CourseList = new List<SelectListItem>();
+            var courses = _context.Course.ToList();
+            foreach (var item in courses)
+            {
+                enrollmentModel.CourseList.Add(new SelectListItem
+                {
+                    Text = item.Code + " " + item.Title,
+                    Value = Convert.ToString(item.Id)
+                });
+            }
+
+
 
             return View(enrollmentModel);
         }
@@ -76,9 +79,18 @@ namespace KUSYS_Demo.Controllers
             var enrollment = new Enrollment();
             var student = _context.Student.Where(x => x.Id == enrollmentModel.StudentId).SingleOrDefault();
             var course = _context.Course.Where(x => x.Id == enrollmentModel.CourseId).SingleOrDefault();
+
+            var matching = _context.Enrollment.Where(x => x.Student.Id == enrollmentModel.StudentId & x.Course.Id == enrollmentModel.CourseId);
+
+            if (!matching.IsNullOrEmpty())
+            {
+                return RedirectToAction(nameof(Index));
+            }
             enrollment.Student = student;
-            enrollment.Course = course;            
+            enrollment.Course = course;
             _context.Add(enrollment);
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

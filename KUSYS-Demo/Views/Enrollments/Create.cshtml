@@ -14,25 +14,32 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <select id="StudentSelection" class="form-select" asp-items="Model.StudentList">
+            <select id="StudentSelection" class="form-select" asp-items="Model.StudentList" asp-for="StudentId">
                 <option value="default">Select A Student</option>
             </select>
-            <select id="CourseList" class="form-select">
+            <select id="CourseList" class="form-select" asp-items="Model.CourseList" asp-for="CourseId">
                 <option value="default">Select A Course</option>
             </select>
 
-            @section Scripts2{
+
+@*             
+
+             <select id="CourseList1" class="form-select" >
+                <option value="default">Select A Course</option>
+            </select>
+
+           @section Scripts2{
 
                 <script>
                     $('#StudentSelection').change(function () {
-                        $('#CourseList').attr('disabled',false);
+                        $('#CourseList1').attr('disabled',false);
                         var id=$(this).val();
-                        $('#CourseList').empty();
+                        $('#CourseList1').empty();
                         $.ajax({
                             url:'/Enrollment/CourseList?id='+id,
                             success:function(result) {
                                 $.each(result,function(i,data) {
-                                    $('#CourseList').append('<option value='+data.Id+'>'+data.name+'</option>');
+                                    $('#CourseList1').append('<option value='+data.Id+'>'+data.name+'</option>');
                                 });
                             }
                         });
@@ -43,7 +50,8 @@
 
                 </script>
 
-            }
+            }*@
+            
 
                 <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary" />
@@ -62,3 +70,8 @@
     }
     }
 
+
+
+     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
