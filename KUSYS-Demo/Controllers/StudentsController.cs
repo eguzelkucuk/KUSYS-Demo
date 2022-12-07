@@ -7,22 +7,47 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KUSYS_Demo.Models;
 using KUSYS_Demo.Models.Domain;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using KUSYS_Demo.Repositories.Implementation;
 
 namespace KUSYS_Demo.Controllers
 {
     public class StudentsController : Controller
     {
         private readonly DatabaseContext _context;
+        //private readonly staticDatas staticDatas;
+        public string userMailAddress;
+        public string userRole;
+
+
 
         public StudentsController(DatabaseContext context)
         {
             _context = context;
+            userMailAddress= staticDatas.getUserMail();
+            userRole=staticDatas.getUserRole();
         }
 
         // GET: Students
         public async Task<IActionResult> Index()
         {
-              return View(await _context.Student.ToListAsync());
+            if (userRole=="admin")
+            {
+                return View(await _context.Student.ToListAsync());
+
+            }
+            if (userRole == "admin")
+            {
+                var student = _context.Student.Where(x => x.Email == userMailAddress);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+            }
+
+            return View(await _context.Student.ToListAsync());
         }
 
         // GET: Students/Details/5
@@ -40,8 +65,12 @@ namespace KUSYS_Demo.Controllers
                 return NotFound();
             }
 
-            return View(student);
+            //return View(student);
+            return PartialView("DetailsModalView",student);
+
         }
+
+        [Authorize(Roles = "admin")]
 
         // GET: Students/Create
         public IActionResult Create()

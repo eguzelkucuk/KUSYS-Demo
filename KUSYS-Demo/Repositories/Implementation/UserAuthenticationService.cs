@@ -21,6 +21,7 @@ namespace KUSYS_Demo.Repositories.Implementation
         public async Task<Status> LoginAsync(LoginModel model)
         {
             var status = new Status();
+            string role="";
             var user = await userManager.FindByEmailAsync(model.Email);
             if (user==null)
             {
@@ -44,9 +45,12 @@ namespace KUSYS_Demo.Repositories.Implementation
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    role=userRole;   
                 }
+                staticDatas _stt = new staticDatas(user.Email,role);
                 status.StatusCode = 1;
                 status.Message = "Logged in successfully.";
+              
                 return status;
             }
             else if (signInResult.IsLockedOut)

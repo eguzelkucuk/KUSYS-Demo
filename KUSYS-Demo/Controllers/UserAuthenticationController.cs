@@ -1,6 +1,8 @@
 ﻿using KUSYS_Demo.Models.DTO;
 using KUSYS_Demo.Repositories.Abstract;
+using KUSYS_Demo.Repositories.Implementation;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KUSYS_Demo.Controllers
@@ -8,10 +10,17 @@ namespace KUSYS_Demo.Controllers
     public class UserAuthenticationController : Controller
     {
         private readonly IUserAuthenticationService _service;
+        private readonly staticDatas _staticDatas;
+        public string userRole;
+
+
+
         public UserAuthenticationController(IUserAuthenticationService service)
         {
             this._service = service;
-                
+            userRole = staticDatas.getUserRole();
+
+
         }
         //public IActionResult Registration()
         //{
@@ -41,6 +50,13 @@ namespace KUSYS_Demo.Controllers
             var result = await _service.LoginAsync(model);
             if (result.StatusCode==1)
             {
+
+                if (userRole=="admin")
+                {
+                    return RedirectToAction("Display", "Dashboard");
+
+                }
+
                 return RedirectToAction("Display","Dashboard");   
             }
             else
@@ -56,6 +72,9 @@ namespace KUSYS_Demo.Controllers
             await _service.LogoutAsync();
             return RedirectToAction(nameof(Login));
         }
+
+
+        // Admin Registration Block
 
         //public async Task<IActionResult> AdminReg()
         //{
@@ -73,6 +92,8 @@ namespace KUSYS_Demo.Controllers
         //    return Ok(result);
 
         //}
+
+        // User Registration Block
 
         //public async Task<IActionResult> UserReg()
         //    {
